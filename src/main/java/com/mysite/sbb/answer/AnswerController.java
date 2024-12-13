@@ -29,7 +29,7 @@ public class AnswerController {
 
   @PreAuthorize("isAuthenticated()") // 로그인이 안된경우, 로그인 페이지로 강제 이동
   @PostMapping("/create/{id}")
-  public String createAnswer(Model model, @PathVariable("id") Integer id, @Valid AnswerForm
+  public String answerCreate(Model model, @PathVariable("id") Integer id, @Valid AnswerForm
       answerForm, BindingResult bindingResult, Principal principal) {
     Question question = this.questionService.getQuestion(id);
     SiteUser siteUser = this.userService.getUser(principal.getName());
