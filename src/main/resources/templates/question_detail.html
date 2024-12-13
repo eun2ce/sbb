@@ -66,18 +66,19 @@
         </tbody>
       </table>
 
-      <form th:action="@{|/comment/create/question/${question.id}|}" th:object="${answerForm}" method="post"
+      <form th:action="@{|/comment/create/question/${question.id}|}" th:object="${answerForm}"
+            method="post"
             class="my-3">
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
         <!--    로그아웃 상태에서는 답변을 작성할 수 없음-->
         <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control"
                   rows="10"></textarea>
         <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control"
-                  rows="10"></textarea> <input type="submit" value="답변등록" class="btn btn-primary my-2">
+                  rows="10"></textarea> <input type="submit" value="답변등록"
+                                               class="btn btn-primary my-2">
       </form>
     </div>
   </div>
-</div>
 
   <!-- 답변의 갯수 표시 -->
   <h5 class="border-bottom my-3 py-2"
