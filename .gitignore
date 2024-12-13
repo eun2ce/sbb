@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### db
-db/H2/*
+*.db

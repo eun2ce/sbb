@@ -34,7 +34,9 @@
              sec:authorize="isAuthenticated()"
              th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
              th:text="수정"></a>
-          <a th:href="@{|/question/delete/${question.id}|}" class="btn btn-sm btn-outline-secondary"
+
+          <a href="javascript:void(0);" th:data-uri="@{|/question/delete/${question.id}|}"
+             class="delete btn btn-sm btn-outline-secondary"
              sec:authorize="isAuthenticated()"
              th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
              th:text="삭제">
@@ -227,9 +229,9 @@
   // 삭제
   const delete_elements = document.getElementsByClassName("delete");
   Array.from(delete_elements).forEach(function(element) {
-    element.addEventListener('click', function() {
+    element.addEventListener('click', function () {
       if (confirm("정말로 삭제하시겠습니까?")) {
-        location.href = this.dataset.uri;
+          location.href = this.dataset.uri;
       };
     });
   });
