@@ -1,6 +1,8 @@
 package com.mysite.sbb.question;
 
+import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerForm;
+import com.mysite.sbb.answer.AnswerService;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 import jakarta.validation.Valid;
@@ -26,19 +28,25 @@ public class QuestionController {
 
   // @RequiredArgsConstructor 애너테이션 방식으로 (생성자 없이) questionRepository 객체 주입
   private final QuestionService questionService;
+  private final AnswerService answerService;
   private final UserService userService;
 
   @GetMapping("/list")
-  public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page) {
-    Page<Question> paging = this.questionService.getList(page);
+  public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "kw", defaultValue = "") String kw) {
+    Page<Question> paging = this.questionService.getList(page, kw);
     model.addAttribute("paging", paging);
+    model.addAttribute("kw", kw);
     return "question_list";
   }
 
   @GetMapping(value = "/detail/{id}")
-  public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
+  public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,
+      @RequestParam(value = "answerPage", defaultValue = "0") int answerPage) {
     Question question = this.questionService.getQuestion(id);
+    Page<Answer> answerPaging = this.answerService.getList(question, answerPage);
     model.addAttribute("question", question);
+    model.addAttribute("answerPaging", answerPaging);
     return "question_detail";
   }
 
@@ -91,9 +99,10 @@ public class QuestionController {
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/delete/{id}")
-  public String questionDelete(QuestionForm questionFrom, @PathVariable("id") Integer id, Principal principal) {
+  public String questionDelete(QuestionForm questionFrom, @PathVariable("id") Integer id,
+      Principal principal) {
     Question question = this.questionService.getQuestion(id);
-    if(!question.getAuthor().getUsername().equals(principal.getName())){
+    if (!question.getAuthor().getUsername().equals(principal.getName())) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
     }
     this.questionService.delete(question);
