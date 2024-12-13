@@ -63,12 +63,12 @@ public class QuestionService {
   }
 
   public void create(String subject, String content, SiteUser author) {
-    Question q = new Question();
-    q.setSubject(subject);
-    q.setContent(content);
-    q.setAuthor(author);
-    q.setCreateDate(LocalDateTime.now());
-    this.questionRepository.save(q);
+    Question question = new Question();
+    question.setSubject(subject);
+    question.setContent(content);
+    question.setAuthor(author);
+    question.setCreateDate(LocalDateTime.now());
+    this.questionRepository.save(question);
   }
 
   public void modify(Question question, String subject, String content) {

@@ -1,12 +1,13 @@
-<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html layout:decorate="~{layout}" xmlns:th="http://www.thymeleaf.org">
 <div layout:fragment="content" class="container my-3">
+
   <!-- 질문 -->
   <h2 class="border-bottom py-2" th:text="${question.subject}"></h2>
   <div class="card my-3">
     <div class="card-body">
+
       <div class="card-text" th:utext="${@commonUtil.markdown(question.content)}"></div>
-      <!--      <div class="card-text" style="white-space: pre-line;" th:text="${question.content}"></div>-->
+
       <div class="d-flex justify-content-end">
         <div th:if="${question.modifyDate != null}"
              class="badge bg-light text-dark p-2 text-start mx-3">
@@ -20,6 +21,7 @@
           <div th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></div>
         </div>
       </div>
+
       <div class="my-3">
         <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
            th:data-uri="@{|/question/vote/${question.id}|}">
@@ -34,10 +36,49 @@
         <a th:href="@{|/question/delete/${question.id}|}" class="btn btn-sm btn-outline-secondary"
            sec:authorize="isAuthenticated()"
            th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
-           th:text="삭제"></a>
+           th:text="삭제">
+        </a>
       </div>
+
+      <!--  댓글  -->
+      <a href="javascript:void(0);" class="comment btn btn-sm btn-outline-secondary"
+         th:id="|question-${question.id}|" th:text="댓글"></a>
+    </div>
+
+    <div style="display: none" th:id="|comment-question-${question.id}|">
+      <!-- 댓글 목록-->
+      <table class="table">
+        <thead class="table-dark">
+        <tr class="text-center">
+          <th style="width: 70%">내용</th>
+          <th>글쓴이</th>
+          <th>작성일시</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="text-center" th:each="question_comment, loop: ${commentList}"
+            th:if="${question_comment.getAnswer() == null}">
+          <td class="text-center" th:text="${question_comment.getContent()}"></td>
+          <td><span th:if="{question_comment.author != null}"
+                    th:text="|${question_comment.author.username}|"></span></td>
+          <td th:text="${#temporals.format(question_comment.createDate, 'yyyy-MM-dd HH:mm)}"></td>
+        </tr>
+        </tbody>
+      </table>
+
+      <form th:action="@{|/comment/create/question/${question.id}|}" th:object="${answerForm}" method="post"
+            class="my-3">
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+        <!--    로그아웃 상태에서는 답변을 작성할 수 없음-->
+        <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control"
+                  rows="10"></textarea>
+        <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control"
+                  rows="10"></textarea> <input type="submit" value="답변등록" class="btn btn-primary my-2">
+      </form>
     </div>
   </div>
+</div>
+
   <!-- 답변의 갯수 표시 -->
   <h5 class="border-bottom my-3 py-2"
       th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
@@ -73,7 +114,8 @@
         <a href="javascript:void(0);" th:data-uri="@{|/answer/delete/${answer.id}|}"
            class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
            th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
-           th:text="삭제"></a>
+           th:text="삭제">
+        </a>
       </div>
     </div>
   </div>

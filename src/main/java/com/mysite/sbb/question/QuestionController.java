@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+@Controller
 @RequestMapping("/question")
 @RequiredArgsConstructor
-@Controller
 public class QuestionController {
 
   // @RequiredArgsConstructor 애너테이션 방식으로 (생성자 없이) questionRepository 객체 주입
