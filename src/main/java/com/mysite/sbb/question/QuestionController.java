@@ -3,10 +3,14 @@ package com.mysite.sbb.question;
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerForm;
 import com.mysite.sbb.answer.AnswerService;
+import com.mysite.sbb.comment.Comment;
+import com.mysite.sbb.comment.CommentForm;
+import com.mysite.sbb.comment.CommentService;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -27,8 +31,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class QuestionController {
 
   // @RequiredArgsConstructor 애너테이션 방식으로 (생성자 없이) questionRepository 객체 주입
-  private final QuestionService questionService;
+
   private final AnswerService answerService;
+  private final CommentService commentService;
+  private final QuestionService questionService;
   private final UserService userService;
 
   @GetMapping("/list")
@@ -45,8 +51,11 @@ public class QuestionController {
       @RequestParam(value = "answerPage", defaultValue = "0") int answerPage) {
     Question question = this.questionService.getQuestion(id);
     Page<Answer> answerPaging = this.answerService.getList(question, answerPage);
+    List<Comment> commantList = this.commentService.getCommentList(question);
     model.addAttribute("question", question);
     model.addAttribute("answerPaging", answerPaging);
+    model.addAttribute("commentList", commantList);
+    model.addAttribute("commentForm", new CommentForm());  // 댓글 작성 폼
     return "question_detail";
   }
 
