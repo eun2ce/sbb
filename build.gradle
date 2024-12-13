@@ -20,7 +20,36 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// developmentOnly: 해당 라이브러리는 개발 환경에만 적용 jar, war 파일에는 포함되지 않음
+	developmentOnly 'org.springframework.boot:spring-boot-devtools' // spring boot
+
+	//lombok: 여러가지 @annotation 을 제공하고 컴파일 과정에서 자동으로 원하는 메서드를 생성/주입 방식으로 동작
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// h2 데이터베이스 사용
+	runtimeOnly 'com.h2database:h2:2.3.232'
+	// 데이터를 저장하거나 조회하기 위해 JPA 사용
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// test
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.junit.jupiter:junit-jupiter'
+
+	// template https://www.thymeleaf.org
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+	// 글에 마크다운을 표기하기위한 라이브러리
+	// 내부에서 관리하는 버전이 아니기 때문에 아래와같이 버전 명시가 필요
+	implementation 'org.commonmark:commonmark:0.21.0'
+
 }
 
 tasks.named('test') {
