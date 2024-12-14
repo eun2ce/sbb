@@ -1,4 +1,4 @@
-<html layout:decorate="~{layout}">
+<html layout:decorate="~{common/layouts/defaultLayout}">
 <div layout:fragment="content" class="container my-3">
   <form th:action="@{/user/login}" method="post">
     <div th:if="${param.error}">

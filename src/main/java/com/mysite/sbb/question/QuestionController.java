@@ -45,7 +45,7 @@ public class QuestionController {
     Page<Question> paging = this.questionService.getList(page, kw);
     model.addAttribute("paging", paging);
     model.addAttribute("kw", kw);
-    return "question_list";
+    return "pages/question/list";
   }
 
   @GetMapping(value = "/detail/{id}")
@@ -57,7 +57,7 @@ public class QuestionController {
     model.addAttribute("question", question);
     model.addAttribute("answerPaging", answerPaging);
     model.addAttribute("commentList", commantList);
-    return "question_detail";
+    return "pages/question/detail";
   }
 
   @PreAuthorize("isAuthenticated()") // 로그인이 안된경우, 로그인 페이지로 강제 이동
@@ -65,7 +65,7 @@ public class QuestionController {
   public String questionCreate(QuestionForm questionForm, Model model) {
     List<Category> categories = this.categoryService.getAll();
     model.addAttribute("categoryList", categories);
-    return "question_form";
+    return "pages/question/form";
   }
 
   @PreAuthorize("isAuthenticated()") // 로그인이 안된경우, 로그인 페이지로 강제 이동
@@ -73,7 +73,7 @@ public class QuestionController {
   public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult,
       Principal principal) {
     if (bindingResult.hasErrors()) {
-      return "question_form";
+      return "pages/question/form";
     }
     SiteUser siteUser = this.userService.getUser(principal.getName());
     Category category = this.categoryService.getCategoryByName(questionForm.getCategory());
@@ -92,7 +92,7 @@ public class QuestionController {
     }
     questionForm.setSubject(question.getSubject());
     questionForm.setContent(question.getContent());
-    return "question_form";
+    return "pages/question/form";
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -101,7 +101,7 @@ public class QuestionController {
       Principal principal,
       @PathVariable("id") Integer id) {
     if (bindingResult.hasErrors()) {
-      return "question_form";
+      return "pages/question/form";
     }
     Question question = this.questionService.getQuestion(id);
     if (!question.getAuthor().getUsername().equals(principal.getName())) {
