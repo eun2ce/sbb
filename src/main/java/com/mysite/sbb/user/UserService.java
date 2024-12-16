@@ -21,6 +21,12 @@ public class UserService {
     return user;
   }
 
+  public SiteUser update(SiteUser siteUser, String password) {
+    siteUser.updatePassword(passwordEncoder.encode(password));
+    this.userRepository.save(siteUser);
+    return siteUser;
+  }
+
   public SiteUser getUser(String username) {
     return this.userRepository.findByUsername(username)
         .orElseThrow(() -> new DataNotFoundException("siteuser not found"));
@@ -29,5 +35,9 @@ public class UserService {
   public SiteUser getUserByEmail(String email) {
     return this.userRepository.findByEmail(email)
         .orElseThrow(() -> new DataNotFoundException("siteuser not found"));
+  }
+
+  public boolean isMatch(String rawPassword, String encodedPassword) {
+    return passwordEncoder.matches(rawPassword, encodedPassword);
   }
 }

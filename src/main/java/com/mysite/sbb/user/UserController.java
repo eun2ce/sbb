@@ -1,8 +1,10 @@
 package com.mysite.sbb.user;
 
 import jakarta.validation.Valid;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -50,6 +52,54 @@ public class UserController {
       return "pages/user/signup";
     }
     return "redirect:/";
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/update")
+  public String update(Model model, Principal principal) {
+    SiteUser siteUser = this.userService.getUser(principal.getName());
+    model.addAttribute("userUpdateForm", new UserUpdateForm());
+    model.addAttribute("username", siteUser.getUsername());
+    model.addAttribute("email", siteUser.getEmail());
+    model.addAttribute("passwordChanged", false);
+    return "pages/user/update";
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @PostMapping("/update")
+  public String update(@Valid UserUpdateForm userUpdateForm, BindingResult bindingResult,
+      Model model, Principal principal) {
+    SiteUser siteUser = this.userService.getUser(principal.getName());
+
+    model.addAttribute("username", siteUser.getUsername());
+    model.addAttribute("email", siteUser.getEmail());
+
+    if (bindingResult.hasErrors()) { // 유효성 검증
+      return "pages/user/update";
+    }
+
+    if (!this.userService.isMatch(userUpdateForm.getOriginPassword(), siteUser.getPassword())) {
+      bindingResult.rejectValue("originPassword", "passwordInCorrect", "기존 비밀번호가 일치하지 않습니다.");
+      return "pages/user/update";
+    }
+
+    if (!userUpdateForm.getNewPassword1().equals(userUpdateForm.getNewPassword2())) {
+      model.addAttribute("originPassword", userUpdateForm.getOriginPassword());
+      model.addAttribute("newPassword1", userUpdateForm.getNewPassword1());
+      model.addAttribute("newPassword2", userUpdateForm.getNewPassword2());
+      bindingResult.rejectValue("newPassword2", "passwordInCorrect", "확인 비밀번호가 일치하지 않습니다.");
+      return "pages/user/update";
+    }
+
+    try {
+      this.userService.update(siteUser, userUpdateForm.getNewPassword1());
+    } catch (Exception e) {
+      bindingResult.reject("updateFailed", e.getMessage());
+      e.printStackTrace();
+      return "pages/user/update";
+    }
+    model.addAttribute("passwordChanged", true);
+    return "pages/user/update";
   }
 
   @GetMapping("/find")
