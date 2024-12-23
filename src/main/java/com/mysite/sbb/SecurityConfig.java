@@ -23,6 +23,7 @@ public class SecurityConfig {
     http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests.requestMatchers(
             new AntPathRequestMatcher("/**")).permitAll())
         .csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
+//        .csrf(csrf -> csrf.disable())
         .headers((headers) -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(
             // 프레임에 포함된 웹 페이지가 동일한 사이트에서 제공할 때 (즉, 부모 페이지가 동일한 사이트)
             XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
