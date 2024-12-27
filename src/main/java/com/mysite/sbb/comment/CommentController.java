@@ -36,7 +36,7 @@ public class CommentController {
 
     if (bindingResult.hasErrors()) {
       model.addAttribute("question", question);
-      return "question_detail";
+      return "pages/question/detail";
     }
 
     this.commentService.create(question, null, commentForm.getContent(),
@@ -53,7 +53,7 @@ public class CommentController {
     Question question = answer.getQuestion();
     if (bindingResult.hasErrors()) {
       model.addAttribute("questiton", question);
-      return "question_detail";
+      return "pages/question/detail";
     }
     this.commentService.create(question, answer, commentForm.getContent(), answer.getAuthor());
     model.addAttribute("commentList", this.commentService.getCommentList(question));

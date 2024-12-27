@@ -2,6 +2,7 @@ package com.mysite.sbb.question;
 
 import com.mysite.sbb.DataNotFoundException;
 import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.category.Category;
 import com.mysite.sbb.user.SiteUser;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -31,16 +32,16 @@ public class QuestionService {
     return new Specification<Question>() {
       @Override
       public Predicate toPredicate(Root<Question> q, CriteriaQuery<?> query,
-          CriteriaBuilder cb) {
+          CriteriaBuilder criteriaBuilder) {
         query.distinct(true); // 중복 제거
         Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
         Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
         Join<Answer, SiteUser> u2 = q.join("author", JoinType.LEFT);
-        return cb.or(cb.like(q.get("subject"), "%" + kw + "%"), // 제목
-            cb.like(q.get("content"), "%" + kw + "%"),      // 내용
-            cb.like(u1.get("username"), "%" + kw + "%"),    // 질문 작성자
-            cb.like(a.get("content"), "%" + kw + "%"),      // 답변 내용
-            cb.like(u2.get("username"), "%" + kw + "%"));
+        return criteriaBuilder.or(criteriaBuilder.like(q.get("subject"), "%" + kw + "%"), // 제목
+            criteriaBuilder.like(q.get("content"), "%" + kw + "%"),      // 내용
+            criteriaBuilder.like(u1.get("username"), "%" + kw + "%"),    // 질문 작성자
+            criteriaBuilder.like(a.get("content"), "%" + kw + "%"),      // 답변 내용
+            criteriaBuilder.like(u2.get("username"), "%" + kw + "%"));
       }
     };
   }
@@ -62,19 +63,21 @@ public class QuestionService {
     }
   }
 
-  public void create(String subject, String content, SiteUser author) {
+  public void create(String subject, String content, SiteUser author, Category category) {
     Question question = new Question();
     question.setSubject(subject);
     question.setContent(content);
     question.setAuthor(author);
     question.setCreateDate(LocalDateTime.now());
+    question.setCategory(category);
     this.questionRepository.save(question);
   }
 
-  public void modify(Question question, String subject, String content) {
+  public void modify(Question question, String subject, String content, Category category) {
     question.setSubject(subject);
     question.setContent(content);
     question.setModifyDate(LocalDateTime.now());
+    question.setCategory(category);
     this.questionRepository.save(question);
   }
 

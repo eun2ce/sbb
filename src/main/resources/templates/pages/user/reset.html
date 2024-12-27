@@ -1,0 +1,35 @@
+<html layout:decorate="~{common/layouts/defaultLayout}" xmlns:th="http://www.thymeleaf.org">
+<div layout:fragment="content" class="container my-3">
+  <div class="card text-center">
+    <div class="card-header"><h4>비밀번호 초기화</h4></div>
+    <div class="card-body">
+      <!--      <div class="card-body" th:if="${!sendConfirm}">-->
+      <h5 class="card-title">가입 시 입력한 이메일을 작성해주세요.</h5>
+      <p class="card-text">해당 메일을 통해 계정 정보를 확인할 수 있습니다.</p>
+
+      <form th:action="@{/user/reset}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div th:if="${error}">
+          <div class="alert alert-danger">
+            확인된 이메일이 없습니다.
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="email" class="form-control" name="email" id="email"
+                 placeholder="joeun2ce@example.com"
+                 aria-label="email" aria-describedby="basic-addon2" required/>
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="submit">비밀번호 찾기</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-body" th:if="${sendConfirm}">
+      <div class="card-text">
+        <h4 th:text="|${email}로 임시 비밀번호 발급이 완료 되었습니다.|"></h4>
+        <a th:href="@{/user/login}" class="delete btn btn-sm btn-primary">로그인 페이지로 이동하기</a>
+      </div>
+
+    </div>
+  </div>
+</div>

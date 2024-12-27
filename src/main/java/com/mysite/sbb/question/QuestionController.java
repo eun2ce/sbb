@@ -3,8 +3,9 @@ package com.mysite.sbb.question;
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerForm;
 import com.mysite.sbb.answer.AnswerService;
+import com.mysite.sbb.category.Category;
+import com.mysite.sbb.category.CategoryService;
 import com.mysite.sbb.comment.Comment;
-import com.mysite.sbb.comment.CommentForm;
 import com.mysite.sbb.comment.CommentService;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
@@ -33,6 +34,7 @@ public class QuestionController {
   // @RequiredArgsConstructor 애너테이션 방식으로 (생성자 없이) questionRepository 객체 주입
 
   private final AnswerService answerService;
+  private final CategoryService categoryService;
   private final CommentService commentService;
   private final QuestionService questionService;
   private final UserService userService;
@@ -43,7 +45,7 @@ public class QuestionController {
     Page<Question> paging = this.questionService.getList(page, kw);
     model.addAttribute("paging", paging);
     model.addAttribute("kw", kw);
-    return "question_list";
+    return "pages/question/list";
   }
 
   @GetMapping(value = "/detail/{id}")
@@ -55,14 +57,15 @@ public class QuestionController {
     model.addAttribute("question", question);
     model.addAttribute("answerPaging", answerPaging);
     model.addAttribute("commentList", commantList);
-    model.addAttribute("commentForm", new CommentForm());  // 댓글 작성 폼
-    return "question_detail";
+    return "pages/question/detail";
   }
 
   @PreAuthorize("isAuthenticated()") // 로그인이 안된경우, 로그인 페이지로 강제 이동
   @GetMapping("/create")
-  public String questionCreate(QuestionForm questionForm) {
-    return "question_form";
+  public String questionCreate(QuestionForm questionForm, Model model) {
+    List<Category> categories = this.categoryService.getAll();
+    model.addAttribute("categoryList", categories);
+    return "pages/question/form";
   }
 
   @PreAuthorize("isAuthenticated()") // 로그인이 안된경우, 로그인 페이지로 강제 이동
@@ -70,10 +73,12 @@ public class QuestionController {
   public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult,
       Principal principal) {
     if (bindingResult.hasErrors()) {
-      return "question_form";
+      return "pages/question/form";
     }
     SiteUser siteUser = this.userService.getUser(principal.getName());
-    this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser);
+    Category category = this.categoryService.getCategoryByName(questionForm.getCategory());
+    this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser,
+        category);
     return "redirect:/question/list";
   }
 
@@ -87,7 +92,7 @@ public class QuestionController {
     }
     questionForm.setSubject(question.getSubject());
     questionForm.setContent(question.getContent());
-    return "question_form";
+    return "pages/question/form";
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -96,13 +101,16 @@ public class QuestionController {
       Principal principal,
       @PathVariable("id") Integer id) {
     if (bindingResult.hasErrors()) {
-      return "question_form";
+      return "pages/question/form";
     }
     Question question = this.questionService.getQuestion(id);
     if (!question.getAuthor().getUsername().equals(principal.getName())) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
     }
-    this.questionService.modify(question, questionForm.getSubject(), questionForm.getContent());
+
+    Category category = this.categoryService.getCategoryByName(questionForm.getCategory());
+    this.questionService.modify(question, questionForm.getSubject(), questionForm.getContent(),
+        category);
     return String.format("redirect:/question/detail/%s", id);
   }
 
